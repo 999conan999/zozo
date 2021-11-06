@@ -37,8 +37,8 @@ async function main(){
   symbols.forEach(e => {
     symbol_flolow+=`${e}; `
   });
-//   bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
-// ${symbol_flolow}`);
+  bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
+${symbol_flolow}`);
   let list_symbol=symbols;
   get_data_socket(list_symbol);
 }
