@@ -1,5 +1,5 @@
 const Binance = require('node-binance-api');
-const binance = new Binance().options({});
+const binance = new Binance().options({'reconnect':true});
 var RSI = require('technicalindicators').RSI;
 const TelegramBot = require('node-telegram-bot-api');
 const token = '2117499364:AAF0rSayZUp4pU3w5z2j0tY5_tCRN6CbnXM';
