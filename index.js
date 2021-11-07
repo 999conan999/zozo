@@ -7,22 +7,14 @@ const chatId=1497494659;
 const bot = new TelegramBot(token, {polling: true});
 var rsi_set=43;
 var so_sanh='<';
+var data_day={
+  day:0,
+  note:''
+}
+var data=[];
+
 //t.me/News_signal_bot
-// var symbols=[
-//   'BTCUSDT',
-//   'NEARUSDT',
-//   'PHAUSDT',
-//   'BNBUSDT',
-//   'ETHUSDT',
-//   'DOTUSDT',
-//   'ALICEUSDT',
-//   'SOLUSDT',
-//   'ICPUSDT',
-//   'C98USDT',
-//   'ADAUSDT',
-//   'SHIBUSDT',
-//   'LINKUSDT',
-// ]
+
 var data_all=[];
 ////////////////////////////////
 // down
@@ -38,7 +30,8 @@ async function main(){
     symbol_flolow+=`${e}; `
   });
   bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
-${symbol_flolow}`);
+${symbol_flolow}
+Các lệnh có thể hỗ trợ : checksocket; now; today; Rsi < 43; btc ;`);
   let list_symbol=symbols;
   get_data_socket(list_symbol);
 }
@@ -47,7 +40,6 @@ ${symbol_flolow}`);
 async function get_data_socket(list_symbol){
 
   binance.futuresChart(list_symbol, time, (symbol, interval, chart) => {
-  // binance.websockets.chart("BTCUSDT", time, (symbol, interval, chart) => {
       let array_data=[];
       Object.keys(chart).forEach(function(key) {
         array_data.push(chart[key].close);
@@ -59,34 +51,65 @@ async function get_data_socket(list_symbol){
       };
       ///
   },500);
+  binance.futuresChart(list_symbol,'1d', (symbol, interval, chart) => {
+    let array_data=[];
+    Object.keys(chart).forEach(function(key) {
+      array_data.push(chart[key].close);
+    })
+    array_data.pop();
+    //
+    data[symbol]={
+      list_close:array_data,
+    };
+    ///
+  },500);
 
 }
 
 // Bot telegram here
 bot.on('message', (msg) => {
-  // const chatId = msg.chat.id;
-  // console.log(chatId)
-  let message_arr=msg.text.toUpperCase().split(" ");
-  if(message_arr[0] == "RSI"){
-    if(message_arr.length != 3 || message_arr[0] != "RSI"){
-      bot.sendMessage(chatId, `Bạn điền không đúng cú pháp rồi:
-  "[RSI][cách][ký tự so sánh > or <][cách][số RSI cần so sánh]"`);
-    }else{
-      let pp_ss="[ERROR]";
-      if(message_arr[1]==">") pp_ss="LỚN HƠN";
-      if(message_arr[1]=="<") pp_ss="NHỎ HƠN";
-      if(pp_ss!="[ERROR]"){
-        so_sanh=message_arr[1];
-        rsi_set=Number(message_arr[2]);
-        bot.sendMessage(chatId, `Ok, tìm kiếm những thông tin rsi ${pp_ss} ${message_arr[2]}; chúng tôi sẽ thông báo!`);
-        check_symbol_ok(true);
-      }else{
-        bot.sendMessage(chatId, `Có gì đó sai sót trong cú pháp của bạn, bạn cần nên xem lại!`);
-      }
+  let tx=msg.text.toUpperCase();
+  if(tx=='CHECKSOCKET'){
+    if(check_socket_run()==true){
+      bot.sendMessage(chatId,'Socket đang chạy!')
+    } else{
+      bot.sendMessage(chatId,'Có lỗi đang xảy ra và socket đang dừng, chờ tí nhá, tôi sẽ kết nối lại ngay lập tức.');
+      main();
     }
-  }else{
-    check_symbol_ok(true,true,msg.text.toUpperCase());
+  }else if(tx=="NOW"){
+    bot.sendMessage(chatId,`"Tất cả các thông tin RSI ${so_sanh}  ${rsi_set}, sẽ được nhắc nhở nếu được phát hiện!"`);
+    check_symbol_ok(true);
+  }else if(tx=="TODAY"){
+    let mss=data_day.note==""?"[không có đồng nào tìm năng]":data_day.note;
+    bot.sendMessage(chatId,`"Những đồng tìm năng cần theo dõi trong hôm nay là: ${mss}"`);
   }
+  else{
+    // const chatId = msg.chat.id;
+    // console.log(chatId)
+    let message_arr=msg.text.toUpperCase().split(" ");
+    if(message_arr[0] == "RSI"){
+      if(message_arr.length != 3 || message_arr[0] != "RSI"){
+        bot.sendMessage(chatId, `Bạn điền không đúng cú pháp rồi:
+    "[RSI][cách][ký tự so sánh > or <][cách][số RSI cần so sánh]"`);
+      }else{
+        let pp_ss="[ERROR]";
+        if(message_arr[1]==">") pp_ss="LỚN HƠN";
+        if(message_arr[1]=="<") pp_ss="NHỎ HƠN";
+        if(pp_ss!="[ERROR]"){
+          so_sanh=message_arr[1];
+          rsi_set=Number(message_arr[2]);
+          bot.sendMessage(chatId, `Ok, tìm kiếm những thông tin rsi ${pp_ss} ${message_arr[2]}; chúng tôi sẽ thông báo!`);
+          check_symbol_ok(true);
+        }else{
+          bot.sendMessage(chatId, `Có gì đó sai sót trong cú pháp của bạn, bạn cần nên xem lại!`);
+        }
+      }
+    }else{
+      check_symbol_ok(true,true,msg.text.toUpperCase());
+    }
+  }
+
+
 });
 
 
@@ -160,3 +183,32 @@ async function get_symbols(){
     })
   return rs;
 }
+
+function check_socket_run(){
+  let check_socket_run=binance.futuresSubscriptions();
+  let result=false;
+  Object.keys(check_socket_run).forEach(function(id_key) {
+    result=true
+  })
+  return result;
+}
+
+// 
+setInterval(()=>{
+  let d = new Date();
+  var day = d.getDate();
+  if(data_day.day!=day){// chua get data ngay hom nay
+      let ms='[';
+      Object.keys(data).forEach(function(key) {
+        let array_close_prices=data[key].list_close;
+        let rsi=RSI.calculate({values:array_close_prices,period : 5});
+        let l= rsi.length-1;
+        if(rsi[l]<=33){
+          ms+='"'+key.replace("USDT", " ")+'('+rsi[l]+')"; ';
+        }
+      })
+      ms+=']';
+      data_day.day=day;
+      data_day.note=ms;
+  }
+},30000)
