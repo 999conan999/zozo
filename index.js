@@ -7,10 +7,7 @@ const chatId=1497494659;
 const bot = new TelegramBot(token, {polling: true});
 var rsi_set=43;
 var so_sanh='<';
-var data_day={
-  day:0,
-  note:''
-}
+
 var data=[];
 
 //t.me/News_signal_bot
@@ -56,7 +53,7 @@ async function get_data_socket(list_symbol){
     Object.keys(chart).forEach(function(key) {
       array_data.push(chart[key].close);
     })
-    array_data.pop();
+    // array_data.pop();
     //
     data[symbol]={
       list_close:array_data,
@@ -80,8 +77,7 @@ bot.on('message', (msg) => {
     bot.sendMessage(chatId,`"Tất cả các thông tin RSI ${so_sanh}  ${rsi_set}, sẽ được nhắc nhở nếu được phát hiện!"`);
     check_symbol_ok(true);
   }else if(tx=="TODAY"){
-    let mss=data_day.note==""?"[không có đồng nào tìm năng]":data_day.note;
-    bot.sendMessage(chatId,`"Những đồng tìm năng cần theo dõi trong hôm nay là: ${mss}"`);
+    check_rsi_day();
   }
   else{
     // const chatId = msg.chat.id;
@@ -122,8 +118,13 @@ setInterval(()=>{
   let minute = d.getMinutes();
   if(minute==1||minute==16||minute==31||minute==46){
     check_symbol_ok(false);
+    check_day_sieu_bat_thuong();
   }
 },40000)
+
+setInterval(()=>{
+    check_day_sieu_bat_thuong();
+},250000)
 
 
 
@@ -142,23 +143,27 @@ if(is_all==false){
     let l= rsi.length-1;
     if(so_sanh_private==">"){
       if(rsi[l]>rsi_set_private){
-        result_symbols_rsi+=(`-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]}
+        result_symbols_rsi+=(`🔥-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]}
 `)
       }
     }else if(so_sanh_private=="<"){
       if(rsi[l]<rsi_set_private){
-        result_symbols_rsi+=(`-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]}
+        result_symbols_rsi+=(`🔥-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]}
 `)
       }
     }
   })
 }else{
-  if(data_all[symbol]!=undefined){
+  if(data_all[symbol]!=undefined&&data[symbol]!=undefined){//[todo]
     let array_close_prices=data_all[symbol].list_close;
     let rsi=RSI.calculate({values:array_close_prices,period : 100});
     let l= rsi.length-1;
-    result_symbols_rsi+=(`-----${symbol.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]}
-`)
+    // day 
+    let list_close_day=data[symbol].list_close;
+    let rsi_d=RSI.calculate({values:list_close_day,period : 4});
+    let t=rsi_d.length-1;
+    result_symbols_rsi+=(`🍒-----${symbol.replace("USDT", "/USDT")}-----🍒
+RSI_15m = ${rsi[l]} ; RSI_1d = ${rsi_d[t]}`)
   }else{
     result_symbols_rsi+=(`Thông tin : "${name_symbol}" không có dữ liệu hoặc không chính xác!`)
   }
@@ -186,29 +191,45 @@ async function get_symbols(){
 
 function check_socket_run(){
   let check_socket_run=binance.futuresSubscriptions();
-  let result=false;
+  let result=false; let i=0;
   Object.keys(check_socket_run).forEach(function(id_key) {
-    result=true
-  })
+    i++;
+  });
+  if(i==2) result=true;
   return result;
 }
 
 // 
-setInterval(()=>{
-  let d = new Date();
-  var day = d.getDate();
-  if(data_day.day!=day){// chua get data ngay hom nay
+function check_rsi_day(){
+// chua get data ngay hom nay
       let ms='[';
       Object.keys(data).forEach(function(key) {
         let array_close_prices=data[key].list_close;
-        let rsi=RSI.calculate({values:array_close_prices,period : 5});
+        let rsi=RSI.calculate({values:array_close_prices,period : 4});
         let l= rsi.length-1;
-        if(rsi[l]<=33){
-          ms+='"'+key.replace("USDT", " ")+'('+rsi[l]+')"; ';
+        let t= rsi.length-2;
+        if(rsi[l]<=33||rsi[t]<=33){
+          ms+='"'+key.replace("USDT", " ")+'('+rsi[t]+'-'+rsi[l]+')"; ';
         }
       })
       ms+=']';
-      data_day.day=day;
-      data_day.note=ms;
-  }
-},30000)
+
+      let mss=ms==""?"[không có đồng nào tìm năng]":ms;
+      bot.sendMessage(chatId,`🔥 "Những đồng tìm năng cần theo dõi trong hôm nay là: ${mss}"`);
+}
+//
+function check_day_sieu_bat_thuong(){
+  let ms='['; let is_show=false;
+  Object.keys(data).forEach(function(key) {
+    let array_close_prices=data[key].list_close;
+    let rsi=RSI.calculate({values:array_close_prices,period : 4});
+    let l= rsi.length-1;
+    if(rsi[l]<=18){
+      ms+='"'+key.replace("USDT", " ")+'('+rsi[l]+')"; ';
+      is_show=true;
+    }
+  })
+  ms+=']';
+  if(is_show) bot.sendMessage(chatId,`⚠️ "Đồng này hiện tại có RSI(4) ngày dưới 18, đây là dữ liệu siêu bất thường: 
+👉 ${ms}"`);
+}
