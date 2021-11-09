@@ -140,14 +140,25 @@ if(is_all==false){
     let array_close_prices=data_all[key].list_close;
     let rsi=RSI.calculate({values:array_close_prices,period : 100});
     let l= rsi.length-1;
+    let show_icon='';
+    // tinh toan rsi day de note rang dong do rat tiem nang hien tai
+    if(data[key]!=undefined){
+      let list_close=data[key].list_close;
+      let rsi_d=RSI.calculate({values:list_close,period : 4});
+      let k=rsi_d.length-1;
+      if(rsi_d[k]<=20||rsi_d[k-1]<=20||rsi_d[k-2]<=20){
+        show_icon='🚩';
+      }
+    }
+
     if(so_sanh_private==">"){
       if(rsi[l]>rsi_set_private){
-        result_symbols_rsi+=(`🔥-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]}
+        result_symbols_rsi+=(`🔥-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]} ${show_icon}
 `)
       }
     }else if(so_sanh_private=="<"){
       if(rsi[l]<rsi_set_private){
-        result_symbols_rsi+=(`🔥-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]}
+        result_symbols_rsi+=(`🔥-----${key.replace("USDT", "/USDT")}-----: RSI = ${rsi[l]} ${show_icon}
 `)
       }
     }
