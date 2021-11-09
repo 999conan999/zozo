@@ -201,20 +201,25 @@ function check_socket_run(){
 // 
 function check_rsi_day(){
 // chua get data ngay hom nay
-      let ms='[';
+      let ms=`[`;
       Object.keys(data).forEach(function(key) {
         let array_close_prices=data[key].list_close;
         let rsi=RSI.calculate({values:array_close_prices,period : 4});
         let l= rsi.length-1;
         let t= rsi.length-2;
-        if(rsi[l]<=33||rsi[t]<=33){
-          ms+='"'+key.replace("USDT", " ")+'('+rsi[t]+'-'+rsi[l]+')"; ';
+        let z= rsi.length-3;
+        if(rsi[l]<=33||rsi[t]<=33||rsi[z]<=33){
+          ms+=`
+`;
+          ms+='"'+key.replace("USDT", " ")+'('+rsi[z]+' - '+rsi[t]+' - '+rsi[l]+')"; ';
         }
       })
-      ms+=']';
+      ms+=`
+]`;
 
       let mss=ms==""?"[không có đồng nào tìm năng]":ms;
-      bot.sendMessage(chatId,`🔥 "Những đồng tìm năng cần theo dõi trong hôm nay là: ${mss}"`);
+      bot.sendMessage(chatId,`🔥 Những đồng tìm năng cần theo dõi trong hôm nay là: 
+${mss}`);
 }
 //
 function check_day_sieu_bat_thuong(){
