@@ -118,13 +118,12 @@ setInterval(()=>{
   let minute = d.getMinutes();
   if(minute==1||minute==16||minute==31||minute==46){
     check_symbol_ok(false);
-    check_day_sieu_bat_thuong();
   }
 },40000)
 
-setInterval(()=>{
-    check_day_sieu_bat_thuong();
-},250000)
+// setInterval(()=>{
+//     check_day_sieu_bat_thuong();
+// },250000)
 
 
 
