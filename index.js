@@ -38,7 +38,7 @@ async function main(){
 }
 // khoi tao socket lay data
 //
-function get_data_socket(list_symbol){
+async function get_data_socket(list_symbol){
 
   try{
     binance.futuresChart(list_symbol, time, (symbol, interval, chart) => {
