@@ -72,8 +72,9 @@ function get_data_socket(list_symbol){
 }
 
 // Bot telegram here
-bot.on('message', (msg) => {
 try{
+bot.on('message', (msg) => {
+
   let tx=msg.text.toUpperCase();
   if(tx=='CHECKSOCKET'){
     if(check_socket_run()==true){
@@ -113,11 +114,10 @@ try{
       check_symbol_ok(true,true,msg.text.toUpperCase());
     }
   }
+});
 }catch(e){
   console.log('loi bot.on(message, (msg) => {')
 }
-
-});
 
 
 
