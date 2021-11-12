@@ -1,5 +1,5 @@
 const Binance = require('node-binance-api');
-const binance = new Binance().options({'reconnect':true});
+const binance = new Binance().options({reconnect:true});
 var RSI = require('technicalindicators').RSI;
 const TelegramBot = require('node-telegram-bot-api');
 const token = '2117499364:AAF0rSayZUp4pU3w5z2j0tY5_tCRN6CbnXM';
@@ -41,6 +41,7 @@ btc ;
     get_data_socket(list_symbol);
   }catch(e){
     console.log("loi main()")
+    console.log(e)
   }
 }
 // khoi tao socket lay data
@@ -61,27 +62,29 @@ async function get_data_socket(list_symbol){
         };
         ///
       }catch(e){
-        console.log('loi data trong socket')
+        console.log('loi data trong socket 15m')
       }
     },500);
-    binance.futuresChart(list_symbol,'1d', (symbol, interval, chart) => {
-      try{
-      let array_data=[];
-      Object.keys(chart).forEach(function(key) {
-        array_data.push(chart[key].close);
-      })
-      // array_data.pop();
-      //
-      data[symbol]={
-        list_close:array_data,
-      };
-      ///
-      }catch(e){
-        console.log('loi data trong socket')
-      }
-    },500);
+    setTimeout(()=>{
+      binance.futuresChart(list_symbol,'1d', (symbol, interval, chart) => {
+        try{
+        let array_data=[];
+        Object.keys(chart).forEach(function(key) {
+          array_data.push(chart[key].close);
+        })
+        // array_data.pop();
+        //
+        data[symbol]={
+          list_close:array_data,
+        };
+        ///
+        }catch(e){
+          console.log('loi data trong socket ngay')
+        }
+      },500);
+  },5000)
   }catch(e){
-    console.log("Loi get_data_socket()")
+    console.log(e)
   }
 
 }
