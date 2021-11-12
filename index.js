@@ -21,50 +21,59 @@ const time="15m"
 main();
 // data_set();
 async function main(){
-  let symbols=await get_symbols();
-  let symbol_flolow='';
-  symbols.forEach(e => {
-    symbol_flolow+=`${e}; `
-  });
-  bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
-${symbol_flolow}
-Các lệnh có thể hỗ trợ : checksocket; now; today; Rsi < 43; btc ;`);
-  let list_symbol=symbols;
-  get_data_socket(list_symbol);
+  try{
+    let symbols=await get_symbols();
+    let symbol_flolow='';
+    symbols.forEach(e => {
+      symbol_flolow+=`${e}; `
+    });
+    bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
+  ${symbol_flolow}
+  Các lệnh có thể hỗ trợ : checksocket; now; today; Rsi < 43; btc ;`);
+    let list_symbol=symbols;
+    get_data_socket(list_symbol);
+  }catch(e){
+    console.log("loi main()")
+  }
 }
 // khoi tao socket lay data
 //
-async function get_data_socket(list_symbol){
+function get_data_socket(list_symbol){
 
-  binance.futuresChart(list_symbol, time, (symbol, interval, chart) => {
+  try{
+    binance.futuresChart(list_symbol, time, (symbol, interval, chart) => {
+        let array_data=[];
+        Object.keys(chart).forEach(function(key) {
+          array_data.push(chart[key].close);
+        })
+        array_data.pop();
+        //
+        data_all[symbol]={
+          list_close:array_data,
+        };
+        ///
+    },500);
+    binance.futuresChart(list_symbol,'1d', (symbol, interval, chart) => {
       let array_data=[];
       Object.keys(chart).forEach(function(key) {
         array_data.push(chart[key].close);
       })
-      array_data.pop();
+      // array_data.pop();
       //
-      data_all[symbol]={
+      data[symbol]={
         list_close:array_data,
       };
       ///
-  },500);
-  binance.futuresChart(list_symbol,'1d', (symbol, interval, chart) => {
-    let array_data=[];
-    Object.keys(chart).forEach(function(key) {
-      array_data.push(chart[key].close);
-    })
-    // array_data.pop();
-    //
-    data[symbol]={
-      list_close:array_data,
-    };
-    ///
-  },500);
+    },500);
+  }catch(e){
+    console.log("Loi get_data_socket()")
+  }
 
 }
 
 // Bot telegram here
 bot.on('message', (msg) => {
+try{
   let tx=msg.text.toUpperCase();
   if(tx=='CHECKSOCKET'){
     if(check_socket_run()==true){
@@ -73,10 +82,10 @@ bot.on('message', (msg) => {
       bot.sendMessage(chatId,'Có lỗi đang xảy ra và socket đang dừng, chờ tí nhá, tôi sẽ kết nối lại ngay lập tức.');
       main();
     }
-  }else if(tx=="NOW"){
+  }else if(tx=="N"){
     bot.sendMessage(chatId,`"Tất cả các thông tin RSI ${so_sanh}  ${rsi_set}, sẽ được nhắc nhở nếu được phát hiện!"`);
     check_symbol_ok(true);
-  }else if(tx=="TODAY"){
+  }else if(tx=="T"){
     check_rsi_day();
   }
   else{
@@ -104,7 +113,9 @@ bot.on('message', (msg) => {
       check_symbol_ok(true,true,msg.text.toUpperCase());
     }
   }
-
+}catch(e){
+  console.log('loi bot.on(message, (msg) => {')
+}
 
 });
 
@@ -164,16 +175,47 @@ if(is_all==false){
     }
   })
 }else{
-  if(data_all[symbol]!=undefined&&data[symbol]!=undefined){//[todo]
+  if(data_all[symbol]!=undefined){//[todo]
     let array_close_prices=data_all[symbol].list_close;
     let rsi=RSI.calculate({values:array_close_prices,period : 100});
-    let l= rsi.length-1;
+    let l= rsi.length-1; let rs_d='';let u=100;leng_array_close_prices=array_close_prices.length-1;
+    while(1){
+      if(rsi[l]<=43||u<=0){
+        break;
+      }else{
+        array_close_prices[leng_array_close_prices]=array_close_prices[leng_array_close_prices]*u/100;
+        rsi=RSI.calculate({values:array_close_prices,period : 100});
+        u--;
+      };
+    }
+    let price_rsi_43=array_close_prices[leng_array_close_prices].toFixed(3);
     // day 
+    if(data[symbol]!=undefined){
     let list_close_day=data[symbol].list_close;
     let rsi_d=RSI.calculate({values:list_close_day,period : 4});
-    let t=rsi_d.length-1;
+    let t=rsi_d.length-1;let j=100; let leng_list_close_D=list_close_day.length-1;
+        // test rsi
+        while(1){
+          if(rsi_d[t]<=18||j<=0){
+            break;
+          }else{
+            list_close_day[leng_list_close_D]=list_close_day[leng_list_close_D]*j/100;
+            rsi_d=RSI.calculate({values:list_close_day,period : 4});
+            j--;
+          };
+        }
+        //
+        let price_rsi_18=list_close_day[leng_list_close_D].toFixed(3);
+    rs_d=`🍑 RSI_1d =( ${rsi_d[t-2]} - ${rsi_d[t-1]} - ${rsi_d[t]})
+* "price < ${price_rsi_18}" => RSI_1day < 18;`;
+
+    }
     result_symbols_rsi+=(`🍒-----${symbol.replace("USDT", "/USDT")}-----🍒
-RSI_15m = ${rsi[l]} ; RSI_1d = ${rsi_d[t]}`)
+===============
+🍑 RSI_15m = ${rsi[l]}
+* "price < ${price_rsi_43}" => RSI_15m < 43;
+===============
+${rs_d}`)
   }else{
     result_symbols_rsi+=(`Thông tin : "${name_symbol}" không có dữ liệu hoặc không chính xác!`)
   }
@@ -233,18 +275,3 @@ function check_rsi_day(){
 ${mss}`);
 }
 //
-function check_day_sieu_bat_thuong(){
-  let ms='['; let is_show=false;
-  Object.keys(data).forEach(function(key) {
-    let array_close_prices=data[key].list_close;
-    let rsi=RSI.calculate({values:array_close_prices,period : 4});
-    let l= rsi.length-1;
-    if(rsi[l]<=18){
-      ms+='"'+key.replace("USDT", " ")+'('+rsi[l]+')"; ';
-      is_show=true;
-    }
-  })
-  ms+=']';
-  if(is_show) bot.sendMessage(chatId,`⚠️ "Đồng này hiện tại có RSI(4) ngày dưới 18, đây là dữ liệu siêu bất thường: 
-👉 ${ms}"`);
-}
