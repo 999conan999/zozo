@@ -23,13 +23,20 @@ main();
 async function main(){
   try{
     let symbols=await get_symbols();
-    let symbol_flolow='';
-    symbols.forEach(e => {
-      symbol_flolow+=`${e}; `
-    });
-    bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
-  ${symbol_flolow}
-  Các lệnh có thể hỗ trợ : checksocket; now; today; Rsi < 43; btc ;`);
+    // let symbol_flolow='';
+    // symbols.forEach(e => {
+    //   symbol_flolow+=`${e}; `
+    // });
+  //   bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
+  // ${symbol_flolow}
+  // Các lệnh có thể hỗ trợ : checksocket; now; today; Rsi < 43; btc ;`);
+    bot.sendMessage(chatId, `Các lệnh có thể hỗ trợ : 
+checksocket;
+n ; 
+t ;
+Rsi < 43 ;
+btc ;
+* 100 d < 34`);
     let list_symbol=symbols;
     get_data_socket(list_symbol);
   }catch(e){
@@ -83,6 +90,31 @@ bot.on('message', (msg) => {
       bot.sendMessage(chatId,'Có lỗi đang xảy ra và socket đang dừng, chờ tí nhá, tôi sẽ kết nối lại ngay lập tức.');
       main();
     }
+  }else if(tx[0]=="*"){// * 100 d < 34
+    
+    let message_arr=msg.text.toUpperCase().split(" ");
+    if(message_arr.length==5){
+      let rsi_c=Number(message_arr[1]);
+      let timeval=message_arr[2];
+      let ss=message_arr[3];
+      let rsi_r=Number(message_arr[4]);
+      if(timeval=="D"||timeval=="15M"){
+        let result =rsi(rsi_c,rsi_r,ss,timeval);
+        bot.sendMessage(chatId,`Những đồng thỏa điều kiện  RSI_${timeval}(${rsi_c}) < ${rsi_r} :
+${result}`); 
+      }else{
+        bot.sendMessage(chatId,`
+        Cú pháp của bạn không chính xác : 
+        [*_rsi số bao nhiêu_(d or 15m)_(< or >)_rsi kết quả]
+        `); 
+      }
+    }else{
+      bot.sendMessage(chatId,`
+Cú pháp của bạn không chính xác : 
+[*_rsi số bao nhiêu_(d or 15m)_(< or >)_rsi kết quả]
+`); 
+    }
+
   }else if(tx=="N"){
     bot.sendMessage(chatId,`"Tất cả các thông tin RSI ${so_sanh}  ${rsi_set}, sẽ được nhắc nhở nếu được phát hiện!"`);
     check_symbol_ok(true);
@@ -277,3 +309,42 @@ function check_rsi_day(){
 ${mss}`);
 }
 //
+function rsi(rsi_c,rsi_r,ss,timeval){
+  let result='';
+  if(timeval=='D'){
+  Object.keys(data).forEach(function(key) {
+    let array_close_prices=data[key].list_close;
+    let rsi=RSI.calculate({values:array_close_prices,period : rsi_c});
+    let l= rsi.length-1;
+    if(ss=="<"){
+    if(rsi[l]<=rsi_r ||rsi[l-1]<=rsi_r ||rsi[l-2]<=rsi_r ||rsi[l-3]<=rsi_r ||rsi[l-4]<=rsi_r){
+      result+=`
+${key} RSI(Now)=${rsi[l]}`;
+    }
+    }else if(ss=='>'){
+    if(rsi[l]>=rsi_r ||rsi[l-1]>=rsi_r ||rsi[l-2]>=rsi_r ||rsi[l-3]>=rsi_r ||rsi[l-4]>=rsi_r){
+      result+=`
+${key} RSI(Now)=${rsi[l]}`;
+    }
+    }
+  })
+}else if(timeval=="15M"){
+  Object.keys(data_all).forEach(function(key) {
+    let array_close_prices=data_all[key].list_close;
+    let rsi=RSI.calculate({values:array_close_prices,period : rsi_c});
+    let l= rsi.length-1;
+  if(ss=="<"){
+    if(rsi[l]<=rsi_r ||rsi[l-1]<=rsi_r ||rsi[l-2]<=rsi_r ||rsi[l-3]<=rsi_r ||rsi[l-4]<=rsi_r){
+      result+=`
+${key} RSI(Now)=${rsi[l]}`;
+    }
+    }else if(ss=='>'){
+    if(rsi[l]>=rsi_r ||rsi[l-1]>=rsi_r ||rsi[l-2]>=rsi_r ||rsi[l-3]>=rsi_r ||rsi[l-4]>=rsi_r){
+      result+=`
+${key} RSI(Now)=${rsi[l]}`;
+    }
+    }
+  })
+}
+  return result;
+}
