@@ -179,12 +179,13 @@ if(is_all==false){
     let array_close_prices=data_all[symbol].list_close;
     let rsi=RSI.calculate({values:array_close_prices,period : 100});
     let l= rsi.length-1; let rs_d='';let u=100;leng_array_close_prices=array_close_prices.length-1;
+    let rsi_s=RSI.calculate({values:array_close_prices,period : 100});
     while(1){
-      if(rsi[l]<=43||u<=0){
+      if(rsi_s[l]<=43||u<=0){
         break;
       }else{
         array_close_prices[leng_array_close_prices]=array_close_prices[leng_array_close_prices]*u/100;
-        rsi=RSI.calculate({values:array_close_prices,period : 100});
+        rsi_s=RSI.calculate({values:array_close_prices,period : 100});
         u--;
       };
     }
@@ -194,13 +195,14 @@ if(is_all==false){
     let list_close_day=data[symbol].list_close;
     let rsi_d=RSI.calculate({values:list_close_day,period : 4});
     let t=rsi_d.length-1;let j=100; let leng_list_close_D=list_close_day.length-1;
+    let rsi_d_s=RSI.calculate({values:list_close_day,period : 4});
         // test rsi
         while(1){
-          if(rsi_d[t]<=18||j<=0){
+          if(rsi_d_s[t]<=18||j<=0){
             break;
           }else{
             list_close_day[leng_list_close_D]=list_close_day[leng_list_close_D]*j/100;
-            rsi_d=RSI.calculate({values:list_close_day,period : 4});
+            rsi_d_s=RSI.calculate({values:list_close_day,period : 4});
             j--;
           };
         }
