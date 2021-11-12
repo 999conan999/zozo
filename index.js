@@ -49,6 +49,7 @@ async function get_data_socket(list_symbol){
 
   try{
     binance.futuresChart(list_symbol, time, (symbol, interval, chart) => {
+      try{
         let array_data=[];
         Object.keys(chart).forEach(function(key) {
           array_data.push(chart[key].close);
@@ -59,8 +60,12 @@ async function get_data_socket(list_symbol){
           list_close:array_data,
         };
         ///
+      }catch(e){
+        console.log('loi data trong socket')
+      }
     },500);
     binance.futuresChart(list_symbol,'1d', (symbol, interval, chart) => {
+      try{
       let array_data=[];
       Object.keys(chart).forEach(function(key) {
         array_data.push(chart[key].close);
@@ -71,6 +76,9 @@ async function get_data_socket(list_symbol){
         list_close:array_data,
       };
       ///
+      }catch(e){
+        console.log('loi data trong socket')
+      }
     },500);
   }catch(e){
     console.log("Loi get_data_socket()")
