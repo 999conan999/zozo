@@ -117,16 +117,16 @@ bot.on('message', (msg) => {
         let a_von=0.2*von;
         //
         let v1_count=(a_von/(4*a)).toFixed(1);
-        let v1_price=d_start-a;
+        let v1_price=(d_start-a).toFixed(he_so);
         //
         let v2_count=(a_von/(3*a)).toFixed(1);
-        let v2_price=d_start-a*2;
+        let v2_price=(d_start-a*2).toFixed(he_so);
         //
         let v3_count=(a_von/(2*a)).toFixed(1);
-        let v3_price=d_start-a*3;
+        let v3_price=(d_start-a*3).toFixed(he_so);
         //
         let v4_count=(a_von/(a)).toFixed(1);
-        let v4_price=d_start-a*4;
+        let v4_price=(d_start-a*4).toFixed(he_so);
         // diem gong lo
         let gong_lo=(v1_count*(v1_price-d_end)+v2_count*(v2_price-d_end)+v3_count*(v3_price-d_end)+v4_count*(v4_price-d_end)).toFixed(1);
         let loc_phat_max=(v1_count*(d_start-v1_price)+v2_count*(d_start-v2_price)+v3_count*(d_start-v3_price)+v4_count*(d_start-v4_price)).toFixed(1);
