@@ -101,6 +101,69 @@ bot.on('message', (msg) => {
       bot.sendMessage(chatId,'Có lỗi đang xảy ra và socket đang dừng, chờ tí nhá, tôi sẽ kết nối lại ngay lập tức.');
       main();
     }
+  }else if(tx[0]=="?"){ // ? 4.2355 2.6673 40
+    let message_arr=msg.text.toUpperCase().split(" ");
+    if(message_arr.length==4){
+      let d_start=Number(message_arr[1]);
+      let d_end=Number(message_arr[2]);
+      let von=Number(message_arr[3]);
+      // tinh he so lam tron\
+      let he_so=message_arr[1].length-(message_arr[1].indexOf('.')+1);
+      if(d_start>d_end){
+        
+        let a_trung_diem=((d_start-d_end)/2).toFixed(he_so);
+        let p_trung_diem=d_start-a_trung_diem;
+        let a=(0.2*a_trung_diem).toFixed(he_so);
+        let a_von=0.2*von;
+        //
+        let v1_count=(a_von/(4*a)).toFixed(1);
+        let v1_price=d_start-a;
+        //
+        let v2_count=(a_von/(3*a)).toFixed(1);
+        let v2_price=d_start-a*2;
+        //
+        let v3_count=(a_von/(2*a)).toFixed(1);
+        let v3_price=d_start-a*3;
+        //
+        let v4_count=(a_von/(a)).toFixed(1);
+        let v4_price=d_start-a*4;
+        // diem gong lo
+        let gong_lo=(v1_count*(v1_price-d_end)+v2_count*(v2_price-d_end)+v3_count*(v3_price-d_end)+v4_count*(v4_price-d_end)).toFixed(1);
+        let loc_phat_max=(v1_count*(d_start-v1_price)+v2_count*(d_start-v2_price)+v3_count*(d_start-v3_price)+v4_count*(d_start-v4_price)).toFixed(1);
+        let loc_phat_min=(v1_count*(d_start-v1_price)).toFixed(1);
+        bot.sendMessage(chatId,`
+Vốn của bạn là ${von}$ , bạn dự định sẽ đầu tư tại giá ${d_start}$ và stoploss của bạn tại giá ${d_end}$ thì:
+=======1️⃣ vòng 1 =======
++💢 Mua số lượng : ${v1_count}
++💲 Tại điểm giá : ${v1_price}$
++⚠️ Nhớ cài stoploss tại ${d_end}$ 
+=======2️⃣ vòng 2 =======
++💢 Mua số lượng : ${v2_count}
++💲 Tại điểm giá : ${v2_price}$
++⚠️ Nhớ cài stoploss tại ${d_end}$ 
+=======3️⃣ vòng 3 =======
++💢 Mua số lượng : ${v3_count}
++💲 Tại điểm giá : ${v3_price}$
++⚠️ Nhớ cài stoploss tại ${d_end}$ 
+=======4️⃣ vòng 4 =======
++💢 Mua số lượng : ${v4_count}
++💲 Tại điểm giá : ${v4_price}$
++⚠️ Nhớ cài stoploss tại ${d_end}$ 
+============================
+*❗❗ Bạn có thể mất ${gong_lo}$ nếu giá chạm stoploss;
+*💱 Bèo Bèo bạn có thể lời nhỏ tầm ${loc_phat_min}$;
+*💰 Cao hơn xíu bạn có thể lời đến ${loc_phat_max}$ và ~~ chốt lời tùy "LÒNG THAM"
+`);
+
+
+      }else{
+        bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
+Điểm d_start phải lớn hơn d_end !`);
+      }
+    }else{
+      bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
+[*__điểm khởi đầu d.start__điểm stoploss d.end__ số vốn ]`); 
+    }
   }else if(tx[0]=="*"){// * 100 d < 34
     
     let message_arr=msg.text.toUpperCase().split(" ");
@@ -330,12 +393,12 @@ function rsi(rsi_c,rsi_r,ss,timeval){
     if(ss=="<"){
     if(rsi[l]<=rsi_r ||rsi[l-1]<=rsi_r ||rsi[l-2]<=rsi_r ||rsi[l-3]<=rsi_r ||rsi[l-4]<=rsi_r){
       result+=`
-${key} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
     }
     }else if(ss=='>'){
     if(rsi[l]>=rsi_r ||rsi[l-1]>=rsi_r ||rsi[l-2]>=rsi_r ||rsi[l-3]>=rsi_r ||rsi[l-4]>=rsi_r){
       result+=`
-${key} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
     }
     }
   })
@@ -347,12 +410,12 @@ ${key} RSI(Now)=${rsi[l]}`;
   if(ss=="<"){
     if(rsi[l]<=rsi_r ||rsi[l-1]<=rsi_r ||rsi[l-2]<=rsi_r ||rsi[l-3]<=rsi_r ||rsi[l-4]<=rsi_r){
       result+=`
-${key} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
     }
     }else if(ss=='>'){
     if(rsi[l]>=rsi_r ||rsi[l-1]>=rsi_r ||rsi[l-2]>=rsi_r ||rsi[l-3]>=rsi_r ||rsi[l-4]>=rsi_r){
       result+=`
-${key} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
     }
     }
   })
