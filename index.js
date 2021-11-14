@@ -281,6 +281,7 @@ if(is_all==false){
     }
   })
 }else{
+  try{
   if(data_all[symbol]!=undefined){//[todo]
     let array_close_prices=data_all[symbol].list_close;
     let rsi=RSI.calculate({values:array_close_prices,period : 100});
@@ -295,7 +296,7 @@ if(is_all==false){
         u--;
       };
     }
-    let price_rsi_43=array_close_prices[leng_array_close_prices].toFixed(3);
+    let price_rsi_43=Number(array_close_prices[leng_array_close_prices]).toFixed(3);
     // day 
     if(data[symbol]!=undefined){
     let list_close_day=data[symbol].list_close;
@@ -313,7 +314,7 @@ if(is_all==false){
           };
         }
         //
-        let price_rsi_18=list_close_day[leng_list_close_D].toFixed(3);
+        let price_rsi_18=Number(list_close_day[leng_list_close_D]).toFixed(3);
     rs_d=`🍑 RSI_1d =( ${rsi_d[t-2]} - ${rsi_d[t-1]} - ${rsi_d[t]})
 * "price < ${price_rsi_18}" => RSI_1day < 18;`;
 
@@ -326,6 +327,9 @@ if(is_all==false){
 ${rs_d}`)
   }else{
     result_symbols_rsi+=(`Thông tin : "${name_symbol}" không có dữ liệu hoặc không chính xác!`)
+  }
+  }catch(e){
+    console.log(e)
   }
 }
   if(result_symbols_rsi!=''){
