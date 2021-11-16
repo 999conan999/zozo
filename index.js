@@ -305,8 +305,10 @@ if(is_all==false){
   try{
   if(data_all[symbol]!=undefined){//[todo]
     let array_close_prices=data_all[symbol].list_close;
+    let price=data_all[symbol].list_close;
     let rsi=RSI.calculate({values:array_close_prices,period : 100});
-    let l= rsi.length-1; let rs_d='';let u=100;leng_array_close_prices=array_close_prices.length-1;
+    let l= rsi.length-1; let rs_d=''; let rs_10d='';let u=100;leng_array_close_prices=array_close_prices.length-1;
+    price=price[leng_array_close_prices];
     let rsi_s=RSI.calculate({values:array_close_prices,period : 100});
     while(1){
       if(rsi_s[l]<=43||u<=0){
@@ -334,18 +336,40 @@ if(is_all==false){
             j--;
           };
         }
-        //
         let price_rsi_18=Number(list_close_day[leng_list_close_D]).toFixed(3);
-    rs_d=`🍑 RSI_1d =( ${rsi_d[t-2]} - ${rsi_d[t-1]} - ${rsi_d[t]})
-* "price < ${price_rsi_18}" => RSI_1day < 18;`;
-
-    }
+    rs_d=`🍑 RSI_d(4) =( ${rsi_d[t-2]} - ${rsi_d[t-1]} - ${rsi_d[t]})
+* "price < ${price_rsi_18}" => RSI_day(10) < 18;`;
+// rsi 10d
+    let list_close_10day=data[symbol].list_close;
+    let rsi_10d=RSI.calculate({values:list_close_10day,period : 10});
+    let tt=rsi_10d.length-1;let jj=100; let leng_list_close_10D=list_close_10day.length-1;
+    let rsi_10d_s=RSI.calculate({values:list_close_10day,period : 10});
+    // test rsi
+    if(tt>2){
+      while(1){
+        if(rsi_10d_s[tt]<=33||jj<=0){
+          break;
+        }else{ 
+          list_close_10day[leng_list_close_10D]=list_close_10day[leng_list_close_10D]*j/100;
+          rsi_10d_s=RSI.calculate({values:list_close_10day,period : 10});
+          jj--;
+        };
+      }
+      let price_rsi_33=Number(list_close_10day[leng_list_close_10D]).toFixed(3);
+rs_10d=`🍑 RSI_d(10) =( ${rsi_10d[tt-2]} - ${rsi_10d[tt-1]} - ${rsi_10d[tt]})
+* "price < ${price_rsi_33}" => RSI_day(10) < 33;`;
+  }
+}
     result_symbols_rsi+=(`🍒-----${symbol.replace("USDT", "/USDT")}-----🍒
+===============
+price = ${price}
 ===============
 🍑 RSI_15m = ${rsi[l]}
 * "price < ${price_rsi_43}" => RSI_15m < 43;
 ===============
-${rs_d}`)
+${rs_d}
+===============
+${rs_10d}`)
   }else{
     result_symbols_rsi+=(`Thông tin : "${name_symbol}" không có dữ liệu hoặc không chính xác!`)
   }
