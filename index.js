@@ -18,18 +18,30 @@ var data_all=[];
 // const time="1w"
 const time="15m"
 ////////////////////////////////
+////////////////////////////////
+const api = require('kucoin-node-api');
+var firebase = require('firebase')
+api.init({
+  environment: 'live'
+})
+const firebaseConfig = {
+  apiKey: "AIzaSyBuI8FyKsLnP1A35BmKttD4W-5-hZnUbZM",
+  authDomain: "data-kucoin.firebaseapp.com",
+  databaseURL: "https://data-kucoin-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "data-kucoin",
+  storageBucket: "data-kucoin.appspot.com",
+  messagingSenderId: "509969784439",
+  appId: "1:509969784439:web:65f99a79ed57a3a9dbf072"
+};
+firebase.initializeApp(firebaseConfig)
+let firebaseDB = firebase.database().ref('data');
+let day_update_ku=0;
+//////////////////////////////
 main();
 // data_set();
 async function main(){
   try{
     let symbols=await get_symbols();
-    // let symbol_flolow='';
-    // symbols.forEach(e => {
-    //   symbol_flolow+=`${e}; `
-    // });
-  //   bot.sendMessage(chatId, `Tìm kiếm những thông tin rsi ${so_sanh} ${rsi_set};Của những đồng coin sau : 
-  // ${symbol_flolow}
-  // Các lệnh có thể hỗ trợ : checksocket; now; today; Rsi < 43; btc ;`);
     bot.sendMessage(chatId, `Các lệnh có thể hỗ trợ : 
 checksocket;
 n ; 
@@ -91,7 +103,7 @@ async function get_data_socket(list_symbol){
 
 // Bot telegram here
 try{
-bot.on('message', (msg) => {
+bot.on('message',async (msg) => {
 
   let tx=msg.text.toUpperCase();
   if(tx=='CHECKSOCKET'){
@@ -194,8 +206,20 @@ Cú pháp của bạn không chính xác :
     check_symbol_ok(true);
   }else if(tx=="T"){
     check_rsi_day();
-  }
-  else{
+  }else if(tx[0]=="/"){// / 100 < 34
+    let data=[]
+    let message_arr=msg.text.toUpperCase().split(" ");
+    if(message_arr.length==4){
+      await firebaseDB.once('value').then((snapshot) => {if (snapshot.exists()) {data=(snapshot.val());} else { console.log("No data available");}}).catch((error) => {console.error(error);});
+      check_rsi_day_kucoin(message_arr[1],message_arr[2],message_arr[3],data);
+    }else{
+      bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
+Ví dụ : / 100 < 45`); 
+    }
+    
+    // console.log(data)
+
+  }else{
     // const chatId = msg.chat.id;
     // console.log(chatId)
     let message_arr=msg.text.toUpperCase().split(" ");
@@ -238,9 +262,6 @@ setInterval(()=>{
   }
 },40000)
 
-// setInterval(()=>{
-//     check_day_sieu_bat_thuong();
-// },250000)
 
 
 
@@ -387,6 +408,44 @@ function check_rsi_day(){
 ${mss}`);
 }
 //
+function check_rsi_day_kucoin(c,ss,rsi_ss,data){
+  let ms_l=`[`;
+  let ms_n=`[`;
+  Object.keys(data).forEach(function(key) {
+    let array_close_prices=data[key].list_close;
+    let rsi=RSI.calculate({values:array_close_prices,period : c});
+    let l= rsi.length-1;
+    let t= rsi.length-2;
+    let z= rsi.length-3;
+    if(ss=='>'){
+      if(rsi[l]>=rsi_ss||rsi[t]>=rsi_ss||rsi[z]>=rsi_ss){
+        ms_l+=`
+`;
+        ms_l+='"'+key.replace("-USDT", " - ")+'('+rsi[z]+' - '+rsi[t]+' - '+rsi[l]+')"; ';
+      }
+
+    }else if(ss=='<'){
+      if(rsi[l]<=rsi_ss||rsi[t]<=rsi_ss||rsi[z]<=rsi_ss){
+        ms_n+=`
+`;
+        ms_n+='"'+key.replace("-USDT", " - ")+'('+rsi[z]+' - '+rsi[t]+' - '+rsi[l]+')"; ';
+      }
+
+    }
+  })
+  ms_l+=`]`;
+  ms_n+=`]`;
+  if(ss=='>'){
+    let mss_l=ms_l=="[]"?"[không có đồng nào tìm năng]":ms_l;
+    bot.sendMessage(chatId,`🔥[Kucoin] Những đồng tìm năng cần theo dõi trong hôm nay là: 
+${mss_l}`);
+  }else if(ss=='<'){
+    let mss_n=ms_n=="[]"?"[không có đồng nào tìm năng]":ms_n;
+    bot.sendMessage(chatId,`🔥[Kucoin] Những đồng tìm năng cần theo dõi trong hôm nay là: 
+${mss_n}`);
+  }
+};
+//
 function rsi(rsi_c,rsi_r,ss,timeval){
   let result='';
   if(timeval=='D'){
@@ -397,12 +456,12 @@ function rsi(rsi_c,rsi_r,ss,timeval){
     if(ss=="<"){
     if(rsi[l]<=rsi_r ||rsi[l-1]<=rsi_r ||rsi[l-2]<=rsi_r ||rsi[l-3]<=rsi_r ||rsi[l-4]<=rsi_r){
       result+=`
-${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " - ")} RSI(Now)=${rsi[l]}`;
     }
     }else if(ss=='>'){
     if(rsi[l]>=rsi_r ||rsi[l-1]>=rsi_r ||rsi[l-2]>=rsi_r ||rsi[l-3]>=rsi_r ||rsi[l-4]>=rsi_r){
       result+=`
-${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " - ")} RSI(Now)=${rsi[l]}`;
     }
     }
   })
@@ -414,15 +473,95 @@ ${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
   if(ss=="<"){
     if(rsi[l]<=rsi_r ||rsi[l-1]<=rsi_r ||rsi[l-2]<=rsi_r ||rsi[l-3]<=rsi_r ||rsi[l-4]<=rsi_r){
       result+=`
-${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " - ")} RSI(Now)=${rsi[l]}`;
     }
     }else if(ss=='>'){
     if(rsi[l]>=rsi_r ||rsi[l-1]>=rsi_r ||rsi[l-2]>=rsi_r ||rsi[l-3]>=rsi_r ||rsi[l-4]>=rsi_r){
       result+=`
-${key.replace("USDT", " ")} RSI(Now)=${rsi[l]}`;
+${key.replace("USDT", " - ")} RSI(Now)=${rsi[l]}`;
     }
     }
   })
 }
   return result;
+}
+
+setInterval(()=>{
+  let d = new Date();
+  let day = d.getDate();
+  let hour = d.getHours();
+  if(day_update_ku!=day&& hour >7){
+    day_update_ku=day;
+    update_data_kucoin();
+  }
+},600000)
+async function update_data_kucoin(){
+  if(time_check!=undefined)  clearInterval(time_check);
+  let data=[]
+  await firebaseDB.once('value').then((snapshot) => {
+    if (snapshot.exists()) {
+      data=(snapshot.val());
+    } else {
+      console.log("No data available");
+    }
+  }).catch((error) => {
+    console.error(error);
+  });
+  let list_symbol_kucoin=await get_symbol_kucoin();
+  let y=0; let time_delay=30000;let dept=list_symbol_kucoin.length;
+  
+  var time_check=setInterval(async () => {
+    let symbol= list_symbol_kucoin[y];
+    // xu ly data here
+    let d = new Date();
+    let day = d.getDate();
+    if(data[symbol]!=undefined){
+      if(data[symbol].day!=day){
+          let list_close=await get_symbol_infor_kucoin(symbol);
+          firebaseDB.child(`${symbol}`).set({
+            day:day,
+            list_close:list_close
+          })
+      }
+    }else{
+      let list_close=await get_symbol_infor_kucoin(symbol);
+      firebaseDB.child(`${symbol}`).set({
+        day:day,
+        list_close:list_close
+      })
+    }
+    // end xu ly data
+    y++;
+    if(y>=dept) clearInterval(time_check);
+  }, time_delay);
+   
+}
+async function get_symbol_kucoin(){
+  let result=[];
+ let rs=await api.getSymbols('USDS');
+    rs.data.forEach(obj => {
+      if(obj.symbol.indexOf('USDT')>-1){
+        result.push(obj.symbol)
+      }
+    });
+  return(result);
+}
+async function get_symbol_infor_kucoin(symbol){
+  let d = new Date();
+  let t = d.getTime();
+  var priorDate =  d.setDate(d.getDate()-150)
+  params = {
+    symbol: symbol,
+    startAt: priorDate,
+    endAt: t,
+    type: '1day'
+  }
+  let result=await  api.getKlines(params);
+  let data=result.data;
+  let close_price=[];
+  data.forEach(arr => {
+    close_price.push(arr[2]);
+  });
+  let close_Revert=close_price.reverse();
+  return close_Revert;
 }

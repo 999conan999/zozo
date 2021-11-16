@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "firebase": "^7.15.4",
     "kucoin-node-api": "^2.1.4",
     "node-binance-api": "^0.13.0",
     "node-telegram-bot-api": "^0.54.0",
