@@ -113,69 +113,148 @@ bot.on('message',async (msg) => {
       bot.sendMessage(chatId,'Có lỗi đang xảy ra và socket đang dừng, chờ tí nhá, tôi sẽ kết nối lại ngay lập tức.');
       main();
     }
-  }else if(tx[0]=="?"){ // ? 4.2355 2.6673 40
+  }else if(tx[0]=="?"){ // ? 10.3 8.3 4.3 400
     let message_arr=msg.text.toUpperCase().split(" ");
-    if(message_arr.length==4){
-      let d_start=Number(message_arr[1]);
-      let d_end=Number(message_arr[2]);
-      let von=Number(message_arr[3]);
-      // tinh he so lam tron\
+    if(message_arr.length==5){
+try{
+      let p_start=Number(message_arr[1]);
+      let p_end=Number(message_arr[2]);
+      let p_out=Number(message_arr[3]);
+      let v=Number(message_arr[4]);
       let he_so=message_arr[1].length-(message_arr[1].indexOf('.')+1);
-      if(d_start>d_end){
-        
-        let a_trung_diem=((d_start-d_end)/2).toFixed(he_so);
-        let p_trung_diem=d_start-a_trung_diem;
-        let a=(0.2*a_trung_diem).toFixed(he_so);
-        let a_von=0.2*von;
-        //
-        let v1_count=(a_von/(4*a)).toFixed(1);
-        let v1_price=(d_start-a).toFixed(he_so);
-        //
-        let v2_count=(a_von/(3*a)).toFixed(1);
-        let v2_price=(d_start-a*2).toFixed(he_so);
-        //
-        let v3_count=(a_von/(2*a)).toFixed(1);
-        let v3_price=(d_start-a*3).toFixed(he_so);
-        //
-        let v4_count=(a_von/(a)).toFixed(1);
-        let v4_price=(d_start-a*4).toFixed(he_so);
-        // diem gong lo
-        let gong_lo=(v1_count*(v1_price-d_end)+v2_count*(v2_price-d_end)+v3_count*(v3_price-d_end)+v4_count*(v4_price-d_end)).toFixed(1);
-        let loc_phat_max=(v1_count*(d_start-v1_price)+v2_count*(d_start-v2_price)+v3_count*(d_start-v3_price)+v4_count*(d_start-v4_price)).toFixed(1);
-        let loc_phat_min=(v1_count*(d_start-v1_price)).toFixed(1);
-        bot.sendMessage(chatId,`
-Vốn của bạn là ${von}$ , bạn dự định sẽ đầu tư tại giá ${d_start}$ và stoploss của bạn tại giá ${d_end}$ thì:
+      let a=((p_start-p_end)/12).toFixed(he_so);
+      let n=(v*0.95/(972*a+376*(p_end-p_out))).toFixed(he_so);
+      let t_sl=(376*n).toFixed(he_so);
+//
+bot.sendMessage(chatId,`
+Vốn của bạn là ${v}$ , vùng giá mà bạn sẽ đầu tư ${p_start}$ đến ${p_end}$, và có thể gồng lỗ đến vùng giá ${p_out} thì:
+========================
+Số lượng mua được khi Full-slot: ${t_sl} 
++💱 đạt 50% slot, và giá hồi về điểm giá bắt đầu(${p_start}$) thì bạn lời :${(74*a*n).toFixed(he_so)}$
++💰 đạt 100% slot, và giá hồi về điểm giá bắt đầu(${p_start}$) thì bạn lời :${(960*a*n).toFixed(he_so)}$
+*❗❗ Bạn có thể mất ${v}$ nếu giá chạm stoploss;
 =======1️⃣ vòng 1 =======
-+💢 Mua số lượng : ${v1_count}
-+💲 Tại điểm giá : ${v1_price}$
-+⚠️ Nhớ cài stoploss tại ${d_end}$ 
++💲  Mua tại điểm giá : ${(p_start-a*0).toFixed(he_so)}$
++💢 Với số lượng : ${(n*1).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======2️⃣ vòng 2 =======
-+💢 Mua số lượng : ${v2_count}
-+💲 Tại điểm giá : ${v2_price}$
-+⚠️ Nhớ cài stoploss tại ${d_end}$ 
++💲  Mua tại điểm giá : ${(p_start-a*1).toFixed(he_so)}$
++💢 Với số lượng : ${(n*1).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======3️⃣ vòng 3 =======
-+💢 Mua số lượng : ${v3_count}
-+💲 Tại điểm giá : ${v3_price}$
-+⚠️ Nhớ cài stoploss tại ${d_end}$ 
++💲  Mua tại điểm giá : ${(p_start-a*2).toFixed(he_so)}$
++💢 Với số lượng : ${(n*2).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======4️⃣ vòng 4 =======
-+💢 Mua số lượng : ${v4_count}
-+💲 Tại điểm giá : ${v4_price}$
-+⚠️ Nhớ cài stoploss tại ${d_end}$ 
++💲  Mua tại điểm giá : ${(p_start-a*3).toFixed(he_so)}$
++💢 Với số lượng : ${(n*3).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======5️⃣ vòng 5 =======
++💲  Mua tại điểm giá : ${(p_start-a*4).toFixed(he_so)}$
++💢 Với số lượng : ${(n*5).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======6️⃣ vòng 6 =======
++💲  Mua tại điểm giá : ${(p_start-a*5).toFixed(he_so)}$
++💢 Với số lượng : ${(n*8).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======7️⃣ vòng 7 =======
++💲  Mua tại điểm giá : ${(p_start-a*6).toFixed(he_so)}$
++💢 Với số lượng : ${(n*13).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======8️⃣ vòng 8 =======
++💲  Mua tại điểm giá : ${(p_start-a*7).toFixed(he_so)}$
++💢 Với số lượng : ${(n*21).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======9️⃣ vòng 9 =======
++💲  Mua tại điểm giá : ${(p_start-a*8).toFixed(he_so)}$
++💢 Với số lượng : ${(n*34).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======🔟 vòng 10 =======
++💲  Mua tại điểm giá : ${(p_start-a*9).toFixed(he_so)}$
++💢 Với số lượng : ${(n*55).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======1️⃣1️⃣ vòng 11 =======
++💲  Mua tại điểm giá : ${(p_start-a*10).toFixed(he_so)}$
++💢 Với số lượng : ${(n*89).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
+=======1️⃣2️⃣ vòng 12 =======
++💲  Mua tại điểm giá : ${(p_start-a*11).toFixed(he_so)}$
++💢 Với số lượng : ${(n*144).toFixed(he_so)}
++⚠️ Nhớ cài stoploss tại ${p_out}$ 
 ============================
-*❗❗ Bạn có thể mất ${gong_lo}$ nếu giá chạm stoploss;
-*💱 Bèo Bèo bạn có thể lời nhỏ tầm ${loc_phat_min}$;
-*💰 Cao hơn xíu bạn có thể lời đến ${loc_phat_max}$ và ~~ chốt lời tùy "LÒNG THAM"
 `);
-
-
-      }else{
-        bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
-Điểm d_start phải lớn hơn d_end !`);
-      }
+//
+}catch(e){
+  console.log("🚀 ~ file: index.js ~ line 190 ~ bot.on ~ e", e)
+  bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
+  [?__điểm khởi đầu d.start __ điểm kết thúc d.end __ điểm cắt lỗ _ số vốn ]`); 
+}
     }else{
       bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
-[*__điểm khởi đầu d.start__điểm stoploss d.end__ số vốn ]`); 
-    }
+[?__điểm khởi đầu d.start __ điểm kết thúc d.end __ điểm cắt lỗ _ số vốn ]`); 
+  }
+
+//     if(message_arr.length==4){
+//       let d_start=Number(message_arr[1]);
+//       let d_end=Number(message_arr[2]);
+//       let von=Number(message_arr[3]);
+//       // tinh he so lam tron\
+//       let he_so=message_arr[1].length-(message_arr[1].indexOf('.')+1);
+//       if(d_start>d_end){
+        
+//         let a_trung_diem=((d_start-d_end)/2).toFixed(he_so);
+//         let p_trung_diem=d_start-a_trung_diem;
+//         let a=(0.2*a_trung_diem).toFixed(he_so);
+//         let a_von=0.2*von;
+//         //
+//         let v1_count=(a_von/(4*a)).toFixed(1);
+//         let v1_price=(d_start-a).toFixed(he_so);
+//         //
+//         let v2_count=(a_von/(3*a)).toFixed(1);
+//         let v2_price=(d_start-a*2).toFixed(he_so);
+//         //
+//         let v3_count=(a_von/(2*a)).toFixed(1);
+//         let v3_price=(d_start-a*3).toFixed(he_so);
+//         //
+//         let v4_count=(a_von/(a)).toFixed(1);
+//         let v4_price=(d_start-a*4).toFixed(he_so);
+//         // diem gong lo
+//         let gong_lo=(v1_count*(v1_price-d_end)+v2_count*(v2_price-d_end)+v3_count*(v3_price-d_end)+v4_count*(v4_price-d_end)).toFixed(1);
+//         let loc_phat_max=(v1_count*(d_start-v1_price)+v2_count*(d_start-v2_price)+v3_count*(d_start-v3_price)+v4_count*(d_start-v4_price)).toFixed(1);
+//         let loc_phat_min=(v1_count*(d_start-v1_price)).toFixed(1);
+//         bot.sendMessage(chatId,`
+// Vốn của bạn là ${von}$ , bạn dự định sẽ đầu tư tại giá ${d_start}$ và stoploss của bạn tại giá ${d_end}$ thì:
+// =======1️⃣ vòng 1 =======
+// +💢 Mua số lượng : ${v1_count}
+// +💲 Tại điểm giá : ${v1_price}$
+// +⚠️ Nhớ cài stoploss tại ${d_end}$ 
+// =======2️⃣ vòng 2 =======
+// +💢 Mua số lượng : ${v2_count}
+// +💲 Tại điểm giá : ${v2_price}$
+// +⚠️ Nhớ cài stoploss tại ${d_end}$ 
+// =======3️⃣ vòng 3 =======
+// +💢 Mua số lượng : ${v3_count}
+// +💲 Tại điểm giá : ${v3_price}$
+// +⚠️ Nhớ cài stoploss tại ${d_end}$ 
+// =======4️⃣ vòng 4 =======
+// +💢 Mua số lượng : ${v4_count}
+// +💲 Tại điểm giá : ${v4_price}$
+// +⚠️ Nhớ cài stoploss tại ${d_end}$ 
+// ============================
+// *❗❗ Bạn có thể mất ${gong_lo}$ nếu giá chạm stoploss;
+// *💱 Bèo Bèo bạn có thể lời nhỏ tầm ${loc_phat_min}$;
+// *💰 Cao hơn xíu bạn có thể lời đến ${loc_phat_max}$ và ~~ chốt lời tùy "LÒNG THAM"
+// `);
+
+
+//       }else{
+//         bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
+// Điểm d_start phải lớn hơn d_end !`);
+//       }
+//     }else{
+//       bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
+// [*__điểm khởi đầu d.start__điểm stoploss d.end__ số vốn ]`); 
+//     }
   }else if(tx[0]=="*"){// * 100 d < 34
     
     let message_arr=msg.text.toUpperCase().split(" ");
