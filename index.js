@@ -129,58 +129,117 @@ try{
 bot.sendMessage(chatId,`
 Vốn của bạn là ${v}$ , vùng giá mà bạn sẽ đầu tư ${p_start}$ đến ${p_end}$, và có thể gồng lỗ đến vùng giá ${p_out} thì:
 ========================
-Số lượng mua được khi Full-slot: ${t_sl} 
+Số lượng Full-slot: ${t_sl} 
 +💱 đạt 50% slot, và giá hồi về điểm giá bắt đầu(${p_start}$) thì bạn lời :${(74*a*n).toFixed(he_so)}$
 +💰 đạt 100% slot, và giá hồi về điểm giá bắt đầu(${p_start}$) thì bạn lời :${(960*a*n).toFixed(he_so)}$
 *❗❗ Bạn có thể mất ${v}$ nếu giá chạm stoploss;
 =======1️⃣ vòng 1 =======
 +💲  Mua tại điểm giá : ${(p_start-a*0).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*1).toFixed(he_so)}
++💢 Với số lượng : ${(n*1).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======2️⃣ vòng 2 =======
 +💲  Mua tại điểm giá : ${(p_start-a*1).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*1).toFixed(he_so)}
++💢 Với số lượng : ${(n*1).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======3️⃣ vòng 3 =======
 +💲  Mua tại điểm giá : ${(p_start-a*2).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*2).toFixed(he_so)}
++💢 Với số lượng : ${(n*2).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======4️⃣ vòng 4 =======
 +💲  Mua tại điểm giá : ${(p_start-a*3).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*3).toFixed(he_so)}
++💢 Với số lượng : ${(n*3).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======5️⃣ vòng 5 =======
 +💲  Mua tại điểm giá : ${(p_start-a*4).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*5).toFixed(he_so)}
++💢 Với số lượng : ${(n*5).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======6️⃣ vòng 6 =======
 +💲  Mua tại điểm giá : ${(p_start-a*5).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*8).toFixed(he_so)}
++💢 Với số lượng : ${(n*8).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======7️⃣ vòng 7 =======
 +💲  Mua tại điểm giá : ${(p_start-a*6).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*13).toFixed(he_so)}
++💢 Với số lượng : ${(n*13).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======8️⃣ vòng 8 =======
 +💲  Mua tại điểm giá : ${(p_start-a*7).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*21).toFixed(he_so)}
++💢 Với số lượng : ${(n*21).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======9️⃣ vòng 9 =======
 +💲  Mua tại điểm giá : ${(p_start-a*8).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*34).toFixed(he_so)}
++💢 Với số lượng : ${(n*34).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======🔟 vòng 10 =======
 +💲  Mua tại điểm giá : ${(p_start-a*9).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*55).toFixed(he_so)}
++💢 Với số lượng : ${(n*55).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======1️⃣1️⃣ vòng 11 =======
 +💲  Mua tại điểm giá : ${(p_start-a*10).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*89).toFixed(he_so)}
++💢 Với số lượng : ${(n*89).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
 =======1️⃣2️⃣ vòng 12 =======
 +💲  Mua tại điểm giá : ${(p_start-a*11).toFixed(he_so)}$
-+💢 Với số lượng : ${(n*144).toFixed(he_so)}
++💢 Với số lượng : ${(n*144).toFixed(1)}
 +⚠️ Nhớ cài stoploss tại ${p_out}$ 
+============================
+`);
+//
+}catch(e){
+  console.log("🚀 ~ file: index.js ~ line 190 ~ bot.on ~ e", e)
+  bot.sendMessage(chatId,`Cú pháp của bạn không chính xác : 
+  [?__điểm khởi đầu d.start __ điểm kết thúc d.end __ điểm cắt lỗ _ số vốn ]`); 
+}
+    }else if(message_arr.length==4){ // ? 10.3 8.3 400
+try{
+      let p_start=Number(message_arr[1]);
+      let p_end=Number(message_arr[2]);
+      let v=Number(message_arr[3]);
+      let he_so=message_arr[1].length-(message_arr[1].indexOf('.')+1);
+      let a=((p_start-p_end)/12).toFixed(he_so);
+      let n=(v/376).toFixed(1);
+      //
+bot.sendMessage(chatId,`
+Vốn của bạn là ${v}$ , vùng giá mà bạn sẽ đầu tư ${p_start}$ đến ${p_end}$ thì:
+========================
+Số lượng Full-slot: ${(1*n/(p_start-a*0)+1*n/(p_start-a*1)+2*n/(p_start-a*2)+3*n/(p_start-a*3)+5*n/(p_start-a*4)+8*n/(p_start-a*5)+13*n/(p_start-a*6)+21*n/(p_start-a*7)+34*n/(p_start-a*8)+55*n/(p_start-a*9)+89*n/(p_start-a*10)+144*n/(p_start-a*11)).toFixed(1)} 
++💱 đạt 50% slot, và giá hồi về điểm giá bắt đầu(${p_start}$) thì bạn lời :${((1*n/(p_start-a*1)+2*2*n/(p_start-a*2)+3*3*n/(p_start-a*3)+5*4*n/(p_start-a*4)+8*5*n/(p_start-a*5))*a).toFixed(he_so)}$
++💰 đạt 100% slot, và giá hồi về điểm giá bắt đầu(${p_start}$) thì bạn lời :${((1*n/(p_start-a*1)+2*2*n/(p_start-a*2)+3*3*n/(p_start-a*3)+5*4*n/(p_start-a*4)+8*5*n/(p_start-a*5)+13*6*n/(p_start-a*6)+21*7*n/(p_start-a*7)+34*8*n/(p_start-a*8)+55*9*n/(p_start-a*9)+89*10*n/(p_start-a*10)+144*11*n/(p_start-a*11))*a).toFixed(he_so)}$
+=======1️⃣ vòng 1 =======
++💲  Mua tại điểm giá : ${(p_start-a*0).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*1).toFixed(he_so)}$
+=======2️⃣ vòng 2 =======
++💲  Mua tại điểm giá : ${(p_start-a*1).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*1).toFixed(he_so)}$
+=======3️⃣ vòng 3 =======
++💲  Mua tại điểm giá : ${(p_start-a*2).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*2).toFixed(he_so)}$
+=======4️⃣ vòng 4 =======
++💲  Mua tại điểm giá : ${(p_start-a*3).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*3).toFixed(he_so)}$
+=======5️⃣ vòng 5 =======
++💲  Mua tại điểm giá : ${(p_start-a*4).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*5).toFixed(he_so)}$
+=======6️⃣ vòng 6 =======
++💲  Mua tại điểm giá : ${(p_start-a*5).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*8).toFixed(he_so)}$
+=======7️⃣ vòng 7 =======
++💲  Mua tại điểm giá : ${(p_start-a*6).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*13).toFixed(he_so)}$
+=======8️⃣ vòng 8 =======
++💲  Mua tại điểm giá : ${(p_start-a*7).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*21).toFixed(he_so)}$
+=======9️⃣ vòng 9 =======
++💲  Mua tại điểm giá : ${(p_start-a*8).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*34).toFixed(he_so)}$
+=======🔟 vòng 10 =======
++💲  Mua tại điểm giá : ${(p_start-a*9).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*55).toFixed(he_so)}$
+=======1️⃣1️⃣ vòng 11 =======
++💲  Mua tại điểm giá : ${(p_start-a*10).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*89).toFixed(he_so)}$
+=======1️⃣2️⃣ vòng 12 =======
++💲  Mua tại điểm giá : ${(p_start-a*11).toFixed(he_so)}$
++💢 Với sô tiền : ${(n*144).toFixed(1)}$
 ============================
 `);
 //
